@@ -1,0 +1,4 @@
+token.txt
+userConfigs/
+__pycache__/
+.DS_Store
