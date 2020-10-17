@@ -2,8 +2,8 @@ import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
 import asyncio
+import requests
 
-global classID
 classID = ""
 
 client = commands.Bot(command_prefix="!")
@@ -18,6 +18,7 @@ async def helloworld(ctx):
 
 @client.command()
 async def setclassID(ctx,*,inputID):
+    global classID
     classID = inputID
     await ctx.send('Class ID was set to ' + classID)
 
