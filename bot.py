@@ -12,5 +12,9 @@ async def on_ready():
 @client.command()
 async def helloworld(ctx):
     await ctx.send("This works!")
-    
-client.run("NzY3MTA2NTM5NDIwMjU0MjYw.X4tFow.DWlZ8pmQG_E5J6G2YenVLiFBoCc")
+
+f = open("token.txt", mode='r')
+f = f.readlines()[0]
+#add your bot's token to the file called token.txt before running 
+
+client.run(f)
