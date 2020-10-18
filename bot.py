@@ -4,6 +4,9 @@ from discord.ext import commands
 import asyncio
 import json
 import boilerkey
+import requests
+from lxml import etree
+from . import config
 
 intents = discord.Intents.default()
 intents.members = True
@@ -19,9 +22,32 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    print("New Member " + member.mention)
-    await member.create_dm()
-    await member.dm_channel.send("Test!")
+    print("New Member " + str(member.display_name))
+
+    CONFIG_PATH = os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_config.json"
+    COUNTER_PATH = os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_counter.json"
+
+    if not os.path.isfile(CONFIG_PATH) or not os.path.isfile(COUNTER_PATH):
+        await member.create_dm()
+        await member.dm_channel.send("""
+        Welcome """ + member.display_name + """! Please complete this brief
+        process to authorize BrightBot to access your information
+        """)
+
+        await boilerkey.askForInfo(client, member)
+        
+
+        
+async def getSession(member):
+
+    username = boilerkey.getConfig(member)["username"]
+    password = boilerkey.generatePassword(member)
+
+    session = create_purdue_cas_session(username, password)
+    brightspace_auth(session)
+    return session
+
+
 
 @client.command()
 async def helloworld(ctx):
