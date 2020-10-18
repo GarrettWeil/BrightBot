@@ -8,8 +8,7 @@ import boilerkey
 intents = discord.Intents.default()
 intents.members = True
 
-
-global classID
+quizList = []
 classID = ""
 
 client = commands.Bot(command_prefix="!", intents=intents)
@@ -31,6 +30,7 @@ async def helloworld(ctx):
 
 @client.command()
 async def setclassID(ctx,*,inputID):
+    global classID
     classID = inputID
     await ctx.send('Class ID was set to ' + classID)
 
