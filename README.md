@@ -4,7 +4,7 @@ Have you had a good experience interacting with Brightspace?
 
 **We sure haven't!**
 
-So, like true computer scientists, we made a discord bot which interacts with BoilerKey 2FA, stores users in json files, and pulls user assignment from the Brightspace API!
+So, like true computer scientists, we made a discord bot which interacts with BoilerKey 2FA, stores users in json files, and pulls user assignment info from the Brightspace API!
 
 This bot is made to be implemented on a class group chat server, where an admin tells it what class it's working with, and where the bot will addusers for all of the members on the server.
 
