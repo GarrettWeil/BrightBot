@@ -6,7 +6,6 @@ import json
 import boilerkey
 import requests
 from lxml import etree
-from . import config
 
 intents = discord.Intents.default()
 intents.members = True
@@ -56,14 +55,14 @@ async def getSession(member):
 def create_purdue_cas_session(username: str, password: str) -> requests.Session:
     session = requests.Session()
 
-    res = session.get(config.PURDUE_LOGIN_URL)
+    res = session.get(PURDUE_LOGIN_URL)
     res.raise_for_status()
 
     tree = etree.HTML(res.text)
     lt = tree.xpath('//*[@name="lt"]/@value')[0]
 
     res = session.post(
-        config.PURDUE_LOGIN_URL,
+        PURDUE_LOGIN_URL,
         data={
             "username": username,
             "password": password,
@@ -80,7 +79,7 @@ def create_purdue_cas_session(username: str, password: str) -> requests.Session:
 
 
 def brightspace_auth(session: requests.Session) -> None:
-    res = session.get(config.BS_SAML_AUTH)
+    res = session.get(BS_SAML_AUTH)
     res.raise_for_status()
 
     tree = etree.HTML(res.text)
