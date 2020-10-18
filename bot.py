@@ -137,7 +137,6 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
         await ctx.send('Initialize the class ID first!')
     else:
         global quizList
-        print("test2")
         print(ctx.author)
         memberName = str(ctx.author)[:len(str(ctx.author))-5]
         print ('starting session')
@@ -154,17 +153,19 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
             if response.text == "":
                await ctx.send('No quizzes!')
             else:
-                print("We're here now")
+
                 data = response.json()
+#                print("We're here then")
 
                 fullResponse = ""
 
                 for quiz in data["Objects"]:
                     tLoc = quiz["DueDate"].index('T') # used to identify position of 'T' to split up the date and time in the DueDate returned value
                     dueDate = quiz["DueDate"][:tLoc] + ' ' + quiz["DueDate"][tLoc + 1:tLoc + 9] + ' UTC' # 8 more as time format is XX:XX:XX
-                    print(dueDate)
+#                    print(dueDate)
                     quizList.append([quiz["Name"], quiz["Description"]["Text"]["Text"], dueDate, False])
                 # y1, m1, d1 = [int(i) for i in datetime.utcnow().strftime('%Y-%m-%d').split("-")]
+                print("We're here now")
                 todayDate = datetime.utcnow()
                 tempQuizList = []
                 for quiz in quizList: # cleaning out quizzes that are already done
