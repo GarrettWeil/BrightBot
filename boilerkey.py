@@ -3,6 +3,10 @@ import json
 import os
 import sys
 
+
+# This is code rewritten from https://github.com/elnardu/local-boilerkey
+
+
 try:
     import requests
     import pyotp
