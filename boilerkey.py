@@ -14,12 +14,6 @@ except ImportError:
 CONFIG_PATH = os.path.dirname(os.path.realpath(__file__)) + "/config.json"
 COUNTER_PATH = os.path.dirname(os.path.realpath(__file__)) + "/counter.json"
 
-# DO NOT LOSE YOUR WAAAAAAY!
-
-# __license__ = "WTFPL"
-# __author__ = "Russian election hackers"
-# __credits__ = ["ITaP", "Mitch Daniels"]
-
 
 def getActivationData(code):
     print("Requesting activation data...")
@@ -78,7 +72,6 @@ def createConfig(member, activationData):
 
 
 def getConfig(member):
-
     name = str(member.author)[:len(str(member.author))-5]
     with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + name + "_config.json") as f:
         return json.load(f)
@@ -122,7 +115,7 @@ async def askForInfo(client, member):
 3. Paste the link (https://m-1b9bef70.duosecurity.com/activate/XXXXXXXXXXX)
    under the qr code right here and press Enter""")
 
-    await asyncio.sleep(0.5)
+    await asyncio.sleep(1)
 
     valid = False
     while not valid:
@@ -141,7 +134,7 @@ async def askForInfo(client, member):
 
     await member.dm_channel.send(
         """5. (Optional) In order to generate full password (pin,XXXXXX),
-   script needs your pin. You can leave this empty."""
+    script needs your pin. You can leave this empty."""
     )
 
     pinObj = await client.wait_for("message")

@@ -24,6 +24,7 @@ client = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print("Ready!")
 
+
 @client.event
 async def on_member_join(member):
 
@@ -40,7 +41,6 @@ async def on_member_join(member):
         await boilerkey.askForInfo(client, member)
 
 
-
 def getSession(member):
 
     username = boilerkey.getConfig(member)
@@ -49,7 +49,6 @@ def getSession(member):
     session = create_purdue_cas_session(username, password)
     brightspace_auth(session)
     return session
-
 
 
 def create_purdue_cas_session(username: str, password: str) -> requests.Session:
@@ -95,11 +94,11 @@ def create_bs_session(username: str, password: str) -> requests.Session:
     return session
 
 
-
 @client.command()
 async def helloworld(ctx):
+    print("This works!")
     await ctx.send("This works!")
-    #await boilerkey.main()
+
 
 @client.command()
 async def setclassID(ctx,*,inputID):
@@ -107,14 +106,17 @@ async def setclassID(ctx,*,inputID):
     classID = inputID
     await ctx.send('Class ID was set to ' + classID)
 
+
 @client.command()
 async def classID(ctx):
     await ctx.send('Current class ID is ' + classID)
+
 
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Make sure that you fill all required inputs!")
+
 
 @client.command()
 async def schedule (ctx):
@@ -126,6 +128,7 @@ async def schedule (ctx):
             await ctx.send('Could not find the class, please check your class ID!')
         else:
             await ctx.send('Formatting schedule...')
+
 
 @client.command()
 async def quizzes (ctx): #unimplemented sections stay out until the user authentication process is completed. For now, uses a temp JSON file
@@ -148,7 +151,7 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
             await ctx.send('Error 403: Invalid permissions! Make sure you logged in!')
         else:
             await ctx.send('Formatting remaining quizzes...')
-            if response.string == "":
+            if response.text == "":
                await ctx.send('No quizzes!')
             else:
                 print("We're here now")
