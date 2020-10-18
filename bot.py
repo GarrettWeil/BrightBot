@@ -3,6 +3,7 @@ from discord.ext.commands import Bot
 from discord.ext import commands
 import asyncio
 import json
+import boilerkey
 
 global classID
 classID = ""
@@ -12,6 +13,10 @@ client = commands.Bot(command_prefix="!")
 @client.event
 async def on_ready():
     print("Ready!")
+
+@client.event
+async def on_member_join():
+    boilerkey.main()
 
 @client.command()
 async def helloworld(ctx):
@@ -26,7 +31,7 @@ async def setclassID(ctx,*,inputID):
 async def schedule (ctx):
     if classID == "":
         await ctx.send('Initialize the class ID first!')
-    else:  
+    else:
         response = requests.get('https://purdue.brightspace.com/d2l/api/le/1.0/' + classID + '/content/toc')
         if response.status_code != '200':
             await ctx.send('Could not find the class, please check your class ID!')
@@ -37,7 +42,7 @@ async def schedule (ctx):
 async def quizzes (ctx): #unimplemented sections stay out until the user authentication process is completed. For now, uses a temp JSON file
     if classID == "":
         await ctx.send('Initialize the class ID first!')
-    else:  
+    else:
         # response = requests.get('https://purdue.brightspace.com/d2l/api/le/1.0/' + classID + '/content/toc')
         # if response.status_code != '200':
         #     await ctx.send('Error ' + response.status_code + ': Could not find the class, please check your class ID!')
@@ -55,9 +60,9 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
             responseString = quiz["Name"] + ': ' + quiz["Description"]["Text"]["Text"] + 'Due: ' + dueDate
             fullResponse = fullResponse + responseString + '\n\n'
         await ctx.send(fullResponse)
-    
+
 f = open("token.txt", mode='r')
 f = f.readlines()[0]
-#add your bot's token to the file called token.txt before running 
+#add your bot's token to the file called token.txt before running
 
 client.run(f)
