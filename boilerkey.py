@@ -85,7 +85,8 @@ def getConfig(member):
 
 
 def setCounter(member, number):
-    with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_counter.json", "w") as f:
+    name = str(member.author)[:len(str(member.author))-5]
+    with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + name + "_counter.json", "w") as f:
         json.dump({"counter": number}, f, indent=2)
 
 
@@ -96,25 +97,20 @@ def getCounter(member):
 
 
 def generatePassword(member):
-    print("made it to start of password generation")
     config = getConfig(member)
-    print("made it to end of getconfig")
-
     counter = getCounter(member)
-    print("made it to end of counter reference")
 
     hotp = pyotp.HOTP(base64.b32encode(config["hotp_secret"].encode()))
-    print("I MADE IT MAAAAA")
+
     hotpPassword = hotp.at(counter)
-    print("I MADE IT PA")
+
     if config.get("pin"):
         password = "{},{}".format(config.get("pin"), hotpPassword)
     else:
         password = hotpPassword
-    print("I MADE IT MA")
 
     setCounter(member, counter + 1)
-    
+
     return password
 
 
@@ -126,6 +122,8 @@ async def askForInfo(client, member):
 3. Paste the link (https://m-1b9bef70.duosecurity.com/activate/XXXXXXXXXXX)
    under the qr code right here and press Enter""")
 
+    await asyncio.sleep(0.5)
+
     valid = False
     while not valid:
         linkObj = await client.wait_for("message")
@@ -136,16 +134,10 @@ async def askForInfo(client, member):
             await member.dm_channel.send("Invalid link. Please try again")
 
 
-
     await member.dm_channel.send("4. Please enter your boilerkey username")
     usernameObj = await client.wait_for("message")
     username = usernameObj.content
     user = {"username":username}
-
-
-
-
-
 
     await member.dm_channel.send(
         """5. (Optional) In order to generate full password (pin,XXXXXX),
@@ -158,31 +150,11 @@ async def askForInfo(client, member):
         pin = ""
         await member.dm_channel.send("Invalid pin")
 
-
-
     activationData = getActivationData(activationCode)
     activationData = json.dumps(activationData)
-
-
     activationData["pin"] = pin
     activationData.update(user)
     createConfig(member, activationData)
     setCounter(member, 0)
 
-
     await member.dm_channel.send("You're all set!\nThanks for getting set up.")
-    #print("Setup successful!")
-
-    #print("Here is your password: ", generatePassword(member))
-
-
-# def main():
-#     if not os.path.isfile(CONFIG_PATH) or not os.path.isfile(COUNTER_PATH):
-#         print("Configuration files not found! Running setup...")
-#         askForInfo()
-#     else:
-#         print(generatePassword())
-#
-#
-# if __name__ == "__main__":
-#     main()

@@ -26,7 +26,6 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    print("New Member " + str(member.display_name))
 
     CONFIG_PATH = os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_config.json"
     COUNTER_PATH = os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_counter.json"
@@ -43,17 +42,10 @@ async def on_member_join(member):
 
 
 def getSession(member):
-    print("reached")
 
     username = boilerkey.getConfig(member)
-    print("reached2")
-
     username = username["username"]
-    print("reached2.5")
-
     password = boilerkey.generatePassword(member)
-    print("reached3")
-
     session = create_purdue_cas_session(username, password)
     brightspace_auth(session)
     return session
@@ -159,6 +151,7 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
             if response.string == "":
                await ctx.send('No quizzes!')
             else:
+                print("We're here now")
                 data = response.json()
 
                 fullResponse = ""
