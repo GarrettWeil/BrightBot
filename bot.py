@@ -5,22 +5,29 @@ import asyncio
 import json
 import boilerkey
 
+intents = discord.Intents.default()
+intents.members = True
+
+
 global classID
 classID = ""
 
-client = commands.Bot(command_prefix="!")
+client = commands.Bot(command_prefix="!", intents=intents)
 
 @client.event
 async def on_ready():
     print("Ready!")
 
 @client.event
-async def on_member_join():
-    boilerkey.main()
+async def on_member_join(member):
+    print("New Member " + member.mention)
+    await member.create_dm()
+    await member.dm_channel.send("Test!")
 
 @client.command()
 async def helloworld(ctx):
     await ctx.send("This works!")
+    #await boilerkey.main()
 
 @client.command()
 async def setclassID(ctx,*,inputID):
