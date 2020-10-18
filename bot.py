@@ -11,6 +11,10 @@ from . import config
 intents = discord.Intents.default()
 intents.members = True
 
+PURDUE_LOGIN_URL = "https://www.purdue.edu/apps/account/cas/login"
+BS_SAML_AUTH = "https://purdue.brightspace.com/d2l/lp/auth/saml/initiate-login?entityId=https://idp.purdue.edu/idp/shibboleth"
+BS_BASE = "https://purdue.brightspace.com"
+
 quizList = []
 classID = ""
 
@@ -35,14 +39,58 @@ async def on_member_join(member):
         """)
 
         await boilerkey.askForInfo(client, member)
-        
 
-        
+
+
 async def getSession(member):
 
     username = boilerkey.getConfig(member)["username"]
     password = boilerkey.generatePassword(member)
 
+    session = create_purdue_cas_session(username, password)
+    brightspace_auth(session)
+    return session
+
+
+
+def create_purdue_cas_session(username: str, password: str) -> requests.Session:
+    session = requests.Session()
+
+    res = session.get(config.PURDUE_LOGIN_URL)
+    res.raise_for_status()
+
+    tree = etree.HTML(res.text)
+    lt = tree.xpath('//*[@name="lt"]/@value')[0]
+
+    res = session.post(
+        config.PURDUE_LOGIN_URL,
+        data={
+            "username": username,
+            "password": password,
+            "lt": lt,
+            "execution": "e1s1",
+            "_eventId": "submit",
+            "submit": "Login",
+        },
+    )
+    res.raise_for_status()
+    assert res.status_code == 200
+
+    return session
+
+
+def brightspace_auth(session: requests.Session) -> None:
+    res = session.get(config.BS_SAML_AUTH)
+    res.raise_for_status()
+
+    tree = etree.HTML(res.text)
+    res = session.post(
+        tree.xpath("//form/@action")[0],
+        data={"SAMLResponse": tree.xpath('//input[@name="SAMLResponse"]/@value')[0]},
+    )
+
+
+def create_bs_session(username: str, password: str) -> requests.Session:
     session = create_purdue_cas_session(username, password)
     brightspace_auth(session)
     return session
@@ -63,12 +111,12 @@ async def setclassID(ctx,*,inputID):
 @client.command()
 async def classID(ctx):
     await ctx.send('Current class ID is ' + classID)
-    
+
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Make sure that you fill all required inputs!")
-    
+
 @client.command()
 async def schedule (ctx):
     if classID == "":
@@ -84,7 +132,7 @@ async def schedule (ctx):
 async def quizzes (ctx): #unimplemented sections stay out until the user authentication process is completed. For now, uses a temp JSON file
     if classID == "":
         await ctx.send('Initialize the class ID first!')
-    else:  
+    else:
         global quizList
         # response = requests.get('https://purdue.brightspace.com/d2l/api/le/1.0/' + classID + '/content/toc')
         # if response.status_code == '404':
@@ -122,7 +170,7 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
                 if ((timeUntilDeadline / timedelta(days=1)) <= 7):
                     quiz[3] = True #mark priority
             fullResponse = fullResponse + quiz[0] + ': ' + quiz[1] + '\n' + quiz[2] + ' UTC.\nWithin 7 days: ' + str(quiz[3]) + "\n\n"
-        quizList = tempQuizList        
+        quizList = tempQuizList
         if(fullResponse == ""):
             fullResponse = 'No quizzes!'
         await ctx.send(fullResponse)
