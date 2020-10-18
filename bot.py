@@ -142,7 +142,7 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
         print ('starting session')
         s =  getSession(ctx)
         print ('created session object')
-        response = s.get('https://purdue.brightspace.com/d2l/api/le/1.0/' + classID + '/content/toc')
+        response = s.get('https://purdue.brightspace.com/d2l/api/le/1.38/' + classID + '/quizzes')
         print ('session started')
         if response.status_code == '404':
             await ctx.send('Error 404: Could not find the class, please check your class ID!')
