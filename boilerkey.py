@@ -56,6 +56,8 @@ def getActivationData(code):
         print(res.json())
         sys.exit(1)
 
+
+    print(res.json()["response"])
     return res.json()["response"]
 
 
@@ -76,7 +78,9 @@ def createConfig(member, activationData):
 
 
 def getConfig(member):
-    with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_config.json", "r") as f:
+
+    name = str(member.author)[:len(str(member.author))-5]
+    with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + name + "_config.json") as f:
         return json.load(f)
 
 
@@ -86,25 +90,31 @@ def setCounter(member, number):
 
 
 def getCounter(member):
-    with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + member.display_name + "_counter.json", "r") as f:
+    name = str(member.author)[:len(str(member.author))-5]
+    with open(os.path.dirname(os.path.realpath(__file__)) + "/userConfigs/" + name + "_counter.json") as f:
         return json.load(f)["counter"]
 
 
 def generatePassword(member):
+    print("made it to start of password generation")
     config = getConfig(member)
+    print("made it to end of getconfig")
+
     counter = getCounter(member)
+    print("made it to end of counter reference")
 
     hotp = pyotp.HOTP(base64.b32encode(config["hotp_secret"].encode()))
-
+    print("I MADE IT MAAAAA")
     hotpPassword = hotp.at(counter)
-
+    print("I MADE IT PA")
     if config.get("pin"):
         password = "{},{}".format(config.get("pin"), hotpPassword)
     else:
         password = hotpPassword
+    print("I MADE IT MA")
 
     setCounter(member, counter + 1)
-
+    
     return password
 
 
@@ -148,7 +158,12 @@ async def askForInfo(client, member):
         pin = ""
         await member.dm_channel.send("Invalid pin")
 
+
+
     activationData = getActivationData(activationCode)
+    activationData = json.dumps(activationData)
+
+
     activationData["pin"] = pin
     activationData.update(user)
     createConfig(member, activationData)

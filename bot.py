@@ -5,6 +5,7 @@ import asyncio
 import json
 import boilerkey
 import requests
+import os
 from lxml import etree
 
 intents = discord.Intents.default()
@@ -41,10 +42,17 @@ async def on_member_join(member):
 
 
 
-async def getSession(member):
+def getSession(member):
+    print("reached")
 
-    username = boilerkey.getConfig(member)["username"]
+    username = boilerkey.getConfig(member)
+    print("reached2")
+
+    username = username["username"]
+    print("reached2.5")
+
     password = boilerkey.generatePassword(member)
+    print("reached3")
 
     session = create_purdue_cas_session(username, password)
     brightspace_auth(session)
@@ -129,13 +137,16 @@ async def schedule (ctx):
 
 @client.command()
 async def quizzes (ctx): #unimplemented sections stay out until the user authentication process is completed. For now, uses a temp JSON file
+
     if classID == "":
         await ctx.send('Initialize the class ID first!')
-    else:  
+    else:
         global quizList
-        memberName = ctx.author[:len(ctx.author)-5]
+        print("test2")
+        print(ctx.author)
+        memberName = str(ctx.author)[:len(str(ctx.author))-5]
         print ('starting session')
-        s = await getSession(memberName)
+        s =  getSession(ctx)
         print ('created session object')
         response = s.get('https://purdue.brightspace.com/d2l/api/le/1.0/' + classID + '/content/toc')
         print ('session started')
@@ -173,7 +184,7 @@ async def quizzes (ctx): #unimplemented sections stay out until the user authent
                         if ((timeUntilDeadline / timedelta(days=1)) <= 7):
                             quiz[3] = True #mark priority
                     fullResponse = fullResponse + quiz[0] + ': ' + quiz[1] + '\n' + quiz[2] + ' UTC.\nWithin 7 days: ' + str(quiz[3]) + "\n\n"
-                quizList = tempQuizList        
+                quizList = tempQuizList
                 if(fullResponse == ""):
                     fullResponse = 'No quizzes!'
                 await ctx.send(fullResponse)
